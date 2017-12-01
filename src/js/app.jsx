@@ -8,97 +8,112 @@ export default class App extends React.Component {
       balance: '',
       rate: '',
       term: '30',
-      payment: ''
-
+      payment: '',
     };
 
     this.handleAppChange = this.handleAppChange.bind(this);
-    this.calculateMortgage = this.calculateMortgage.bind(this);
-
+    this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
-    handleAppChange (event) {
-      this.setState({[event.target.name]: event.target.value});
-      
+  handleAppChange (event) {
+    this.setState({[event.target.name]: event.target.value});
+  }
 
+  handleButtonClick(event){
+
+    event.preventDefault();
+
+    let payment;
+    let balance = this.state.balance;
+    let rate = this.state.rate / 100 / 12;
+    let term = this.state.term * 12;
+
+    payment = calculateMortgage(balance, rate, term);
+      
+    function calculateMortgage (balance, rate, term) {
+      return balance * rate * (Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
     }
-    
-    calculateMortgage () {
 
-      var balance = this.state.balance;
-      var rate = this.state.rate / 100 / 12;
-      var term = this.state.term * 12;
-        
-      balance * rate * (math.pow(1 + rate, term)) 
-      / (math.pow(1 + rate, term) - 1);
-      
-      this.setState (
-        payment
-      )
-
-      }
+    this.setState ({payment: payment.toFixed(2)});
+       
+  };
     
   render() {
     return (
-      <div className='container'>
-        <div class="col-1g-12">
+      <form className='form-horizontal'>
+        <div className="col-1g-12">
           <h3>Mortgage Calculator</h3>
+          <hr />
         </div>
         
-        <div class="col=lg=12">
-          <label>
-            Loan Balance
-            <input
-            onChange={this.handleAppChange}
-            value={this.state.balance}
-            id="amount-balance"
-            name="balance"
-            type="number"
-            />
-          </label>
-        </div>
-        <div className="clearfix" />
-        
-        <div class="col-lg-12">
-          <label>
-            Interest Rate (%)
-            <input 
-            onChange={this.handleAppChange}
-            value={this.state.rate}
-            id="amount-rate"
-            name="rate"
-            type="number"
-            step="0.01"
-            />
-          </label>
-        </div>
-        <div className="clearfix" />
+        <div className="row container">
+          <div className="form-group">
+            <label className="col-sm-4 control-label">
+              <div className="text-left">Loan Balance</div>
+              <div className="col-md-12">
+                <input
+                onChange={this.handleAppChange}
+                value={this.state.balance}
+                id="balance"
+                className="form-control"
+                name="balance"
+                type="number"
+                />
+              </div>
+            </label>
+          </div>
+          <div className="clearfix" />
+          
+          <div className="form-group">
+            <label className="col-sm-4 control-label">
+              <div className="text-left">Interest Rate (%)</div>
+              <div className="col-md-12">
+                <input 
+                onChange={this.handleAppChange}
+                value={this.state.rate}
+                id="rate"
+                className="form-control"
+                name="rate"
+                type="number"
+                step="0.01"
+                />
+              </div>
+            </label>
+          </div>
+          <div className="clearfix" />
 
-        <div class="col-lg-12">    
-          <label>
-            Loan Term (in years)
-            <select name='term'>
-              <option value="15">15</option>
-              <option value="30">30</option>
-            </select>
-          </label>
-        </div>    
-        <div className="clearfix" />
+          <div className="form-group">    
+            <label className="col-sm-4 control-label">
+              <div className="text-left">Loan Term (in years)</div>
+              <div className="col-md-12">
+                <select 
+                value={this.state.term} 
+                onChange={this.handleAppChange}
+                className="form-control"
+                name='term'>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                </select>
+              </div>
+            </label>
+          </div>    
+          <div className="clearfix" />
 
-        <button 
-        className="btn btn-primary btn-lg" 
-        name="submit" 
-        id="submit" 
-        type="submit" 
-        onClick={this.calculateMortgage}>
-        Calculate
-        </button>
+          <div className="form-group">
+            <div className="col-sm-10">
+            <button 
+              className="btn btn-primary btn-default" 
+              id="submit" 
+              type="submit" 
+              onClick={this.handleButtonClick}>Calculate</button>
+            </div>
+          </div>
 
-        <div name='output'>
-          <h4>{this.state.payment} is your payment.</h4>
-        </div>
-        
-      </div>
+          {this.state.payment && (<div className="form-group text-justify" id="output" name='output'>
+            <h4>${this.state.payment} is your payment.</h4>
+          </div>)}
+       </div>   
+      </form>
     );
   }
 }
